@@ -1,18 +1,17 @@
 #include <Arduino.h>
-
-// put function declarations here:
-int myFunction(int, int);
+#include "oled.h"
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  Serial.begin(115200);
+
+  // Khởi tạo màn hình OLED
+  oled_init();
+
+  // In thử một dòng chữ lên OLED
+  oled_print("Hello OLED");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  // Nếu chỉ cần hiển thị tĩnh thì để trống
+  // Có thể thêm hiệu ứng hay cập nhật nội dung ở đây
 }
