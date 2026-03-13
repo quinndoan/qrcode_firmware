@@ -3,6 +3,7 @@
 #include "wifiHandler.h"
 #include "buttonHandler.h"
 #include "mqttHandler.h"
+#include "rfidHandler.h"
 
 enum WifiMode {
   WIFI_MODE_STA = 0,
@@ -22,6 +23,9 @@ void setup() {
 
   // Cấu hình MQTT (sẽ tự kết nối khi có mạng trong loop)
   mqtt_init();
+
+  // Khởi tạo RFID 125kHz
+  rfid_init();
 
   // Khởi tạo màn hình OLED
   oled_init();
@@ -71,6 +75,19 @@ void loop() {
   // Nếu đang ở STA và có WiFi thì xử lý MQTT
   if (currentWifiMode == WIFI_MODE_STA && wifi_is_connected()) {
     mqtt_loop();
+  }
+
+  // Cập nhật dữ liệu từ module RFID
+  rfid_update();
+
+  // Nếu vừa đọc được thẻ RFID thì hiển thị lên Serial và OLED
+  if (rfid_has_new_tag()) {
+    String tag = rfid_get_last_tag();
+    Serial.print("[RFID] Tag: ");
+    Serial.println(tag);
+
+    // Hiển thị mã thẻ trên OLED
+    oled_print(tag.c_str());
   }
 
   delay(20); // chống dội đơn giản, giảm tải CPU
