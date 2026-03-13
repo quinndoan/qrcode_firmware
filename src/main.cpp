@@ -3,6 +3,13 @@
 #include "wifiHandler.h"
 #include "buttonHandler.h"
 
+enum WifiMode {
+  WIFI_MODE_STA = 0,
+  WIFI_MODE_AP
+};
+
+WifiMode currentWifiMode = WIFI_MODE_STA;
+
 void setup() {
   Serial.begin(115200);
 
@@ -33,9 +40,25 @@ void loop() {
     lastState = buttonState;
     if (buttonState == LOW) {
       Serial.println("Button pressed");
+
+      // Khi đang ở STA, nhấn nút sẽ chuyển sang AP
+      if (currentWifiMode == WIFI_MODE_STA) {
+        bool ok = wifi_start_ap(WIFI_AP_SSID, WIFI_AP_PASS);
+        if (ok) {
+          currentWifiMode = WIFI_MODE_AP;
+          oled_print("AP MODE");
+        } else {
+          oled_print("AP FAIL");
+        }
+      }
     } else {
       Serial.println("Button released");
     }
+  }
+
+  // Nếu đang ở AP mode thì xử lý request WebServer
+  if (currentWifiMode == WIFI_MODE_AP) {
+    wifi_ap_handle_client();
   }
 
   delay(20); // chống dội đơn giản, giảm tải CPU
